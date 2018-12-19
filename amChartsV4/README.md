@@ -1,3 +1,3 @@
 # Screenshot of results so far
 
-![screenshot](https://github.com/hirurana/visualisationTools/blob/master/amChartsV4/screenshot.png)
+![screenshot](https://github.com/hirurana/visualisationTools/blob/master/amChartsV4/screenrecording.gif)
