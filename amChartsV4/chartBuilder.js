@@ -1,7 +1,7 @@
-var dataWhole = $.getJSON("brazil.json", function( data ){
+var dataWhole = $.getJSON("ICO.json", function( data ){
     var countries = data.map(function(a) {return a.id;});
     var chart = am4core.create("chartdiv", am4charts.XYChart);
-    console.log(data[0].data);
+    console.log(data);
     chart.data = data[0].data;
 
     // create axis
@@ -81,6 +81,57 @@ var dataWhole = $.getJSON("brazil.json", function( data ){
     importsSeries.tooltip.label.textAlign = "middle";
     importsSeries.tooltip.label.textValign = "middle";
 
+    var disappearanceSeries = chart.series.push(new am4charts.LineSeries());
+    disappearanceSeries.name = "Disappearance";
+    disappearanceSeries.dataFields.valueY = "Disappearance";
+    disappearanceSeries.dataFields.categoryX = "year";
+    disappearanceSeries.bullets.push(new am4charts.CircleBullet());
+    disappearanceSeries.minBulletDistance = 15;
+    // tooltip
+    disappearanceSeries.tooltipText = "{Disappearance}";
+    // Drop-shaped tooltips
+    disappearanceSeries.tooltip.background.cornerRadius = 20;
+    disappearanceSeries.tooltip.background.strokeOpacity = 0;
+    disappearanceSeries.tooltip.pointerOrientation = "vertical";
+    disappearanceSeries.tooltip.label.minWidth = 40;
+    disappearanceSeries.tooltip.label.minHeight = 40;
+    disappearanceSeries.tooltip.label.textAlign = "middle";
+    disappearanceSeries.tooltip.label.textValign = "middle";
+
+    var netImportsSeries = chart.series.push(new am4charts.LineSeries());
+    netImportsSeries.name = "Net Imports";
+    netImportsSeries.dataFields.valueY = "NetImports";
+    netImportsSeries.dataFields.categoryX = "year";
+    netImportsSeries.bullets.push(new am4charts.CircleBullet());
+    netImportsSeries.minBulletDistance = 15;
+    // tooltip
+    netImportsSeries.tooltipText = "{NetImports}";
+    // Drop-shaped tooltips
+    netImportsSeries.tooltip.background.cornerRadius = 20;
+    netImportsSeries.tooltip.background.strokeOpacity = 0;
+    netImportsSeries.tooltip.pointerOrientation = "vertical";
+    netImportsSeries.tooltip.label.minWidth = 40;
+    netImportsSeries.tooltip.label.minHeight = 40;
+    netImportsSeries.tooltip.label.textAlign = "middle";
+    netImportsSeries.tooltip.label.textValign = "middle";
+
+    var reExportsSeries = chart.series.push(new am4charts.LineSeries());
+    reExportsSeries.name = "Re-Imports";
+    reExportsSeries.dataFields.valueY = "ReImports";
+    reExportsSeries.dataFields.categoryX = "year";
+    reExportsSeries.bullets.push(new am4charts.CircleBullet());
+    reExportsSeries.minBulletDistance = 15;
+    // tooltip
+    reExportsSeries.tooltipText = "{ReImports}";
+    // Drop-shaped tooltips
+    reExportsSeries.tooltip.background.cornerRadius = 20;
+    reExportsSeries.tooltip.background.strokeOpacity = 0;
+    reExportsSeries.tooltip.pointerOrientation = "vertical";
+    reExportsSeries.tooltip.label.minWidth = 40;
+    reExportsSeries.tooltip.label.minHeight = 40;
+    reExportsSeries.tooltip.label.textAlign = "middle";
+    reExportsSeries.tooltip.label.textValign = "middle";
+
     // Make bullets grow on hover
     var bullet = productionSeries.bullets.push(new am4charts.CircleBullet());
     bullet.circle.strokeWidth = 2;
@@ -98,6 +149,10 @@ var dataWhole = $.getJSON("brazil.json", function( data ){
     chart.scrollbarX.series.push(productionSeries);
     chart.scrollbarX.series.push(exportSeries);
     chart.scrollbarX.series.push(domesticConsumptionSeries);
+    chart.scrollbarX.series.push(importsSeries);
+    chart.scrollbarX.series.push(disappearanceSeries);
+    chart.scrollbarX.series.push(netImportsSeries);
+    chart.scrollbarX.series.push(reExportsSeries);
     chart.scrollbarX.parent = chart.bottomAxesContainer;
 
     // LEGEND
@@ -113,13 +168,13 @@ var dataWhole = $.getJSON("brazil.json", function( data ){
 
 
     // Create map instance
-    var chart = am4core.create("mapdiv", am4maps.MapChart);
+    var map = am4core.create("mapdiv", am4maps.MapChart);
     // Set map definition
-    chart.geodata = am4geodata_worldLow;
+    map.geodata = am4geodata_worldLow;
     // Set projection
-    chart.projection = new am4maps.projections.Miller();
+    map.projection = new am4maps.projections.Miller();
     // Create map polygon series
-    var polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
+    var polygonSeries = map.series.push(new am4maps.MapPolygonSeries());
     // Make map load polygon (like country names) data from GeoJSON
     polygonSeries.useGeodata = true;
 
@@ -137,22 +192,27 @@ var dataWhole = $.getJSON("brazil.json", function( data ){
     polygonSeries.exclude = ["AQ"];
 
     polygonTemplate.events.on("hit", function(ev) {
-        ev.target.series.chart.zoomToMapObject(ev.target)
+        ev.target.series.chart.zoomToMapObject(ev.target);
+        var countryAlpha2 = ev.target.dataItem.dataContext.id;
+        console.log(countryAlpha2);
+        var countryData = data.find(x => x.id === countryAlpha2).data;
+        console.log(countryData);
+        chart.data = countryData;
     });
 
-    chart.zoomControl = new am4maps.ZoomControl();
-    chart.zoomControl.align = "right";
-    chart.zoomControl.marginRight = 5;
-    chart.zoomControl.slider.height = 100;
-    chart.zoomControl.marginBottom = "10%";
+    map.zoomControl = new am4maps.ZoomControl();
+    map.zoomControl.align = "right";
+    map.zoomControl.marginRight = 5;
+    map.zoomControl.slider.height = 100;
+    map.zoomControl.marginBottom = "10%";
 
-    var button = chart.chartContainer.createChild(am4core.Button);
+    var button = map.chartContainer.createChild(am4core.Button);
     button.padding(5, 5, 5, 5);
     button.width = 20;
     button.align = "right";
     button.marginRight = 15;
     button.events.on("hit", function() {
-        chart.goHome();
+        map.goHome();
     });
     button.icon = new am4core.Sprite();
     button.icon.path = "M16,8 L14,8 L14,16 L10,16 L10,10 L6,10 L6,16 L2,16 L2,8 L0,8 L8,0 L16,8 Z M16,8";
