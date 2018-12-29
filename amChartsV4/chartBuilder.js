@@ -1,8 +1,9 @@
 var dataWhole = $.getJSON("ICO.json", function( data ){
     var countries = data.map(function(a) {return a.id;});
     var chart = am4core.create("chartdiv", am4charts.XYChart);
-    console.log(data);
-    chart.data = data[0].data;
+    var worldData = data.find(x => x.id === "WORLD").data;
+    console.log(worldData);
+    chart.data = worldData;
 
     // create axis
     var yearAxis = chart.xAxes.push(new am4charts.CategoryAxis());
@@ -212,6 +213,7 @@ var dataWhole = $.getJSON("ICO.json", function( data ){
     button.align = "right";
     button.marginRight = 15;
     button.events.on("hit", function() {
+        chart.data = worldData;
         map.goHome();
     });
     button.icon = new am4core.Sprite();
